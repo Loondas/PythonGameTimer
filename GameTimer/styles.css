@@ -1,0 +1,63 @@
+.clock {
+	position: fixed;
+	height: 200px;
+	width: 200px;
+	background-color: blue;
+	border-radius: 50%;
+}
+.shand {
+	position: absolute;
+	top: 0px;
+	left: 99px;
+	height: 100px;
+	width: 2px;
+	border: 2px solid;
+	background-color: lightgreen;
+	transform-origin: 100% 50%;
+}
+.mhand {
+	position: absolute;
+	top: 0px;
+	left: 97.5px;
+	height: 100px;
+	width: 5px;
+	border: 2px solid;
+	background-color: orange;
+	transform-origin: 100% 50%;
+}
+.hhand {
+	position: absolute;
+	top: 30px;
+	left: 95px;
+	height: 70px;
+	width: 10px;
+	border: 2px solid;
+	background-color: cyan;
+	transform-origin: 100% 50%;
+}
+.analog {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin-top: -100px;
+	margin-left: -100px;
+}
+.strtstp {
+	position: relative;
+	top: 200px;
+	left: 60px;
+}
+#editor{
+	position: absolute;
+	right: 100px;
+	top: 300px;
+}
+#rep{
+	width: 500px;
+}
+#time, #date{
+	display: block;
+}
+p:hover{
+	color:blue;
+}
