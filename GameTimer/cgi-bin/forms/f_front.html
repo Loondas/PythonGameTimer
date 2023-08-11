@@ -1,4 +1,4 @@
-
+	</table>
 	</div>
     <title>Timer Main</title>
 	<div class="analog">
@@ -7,7 +7,7 @@
 	<div class="hhand"></div>
 	<div class="shand"></div>
 	
-	<button class="strtstp" onclick="clocking(); AxTimes('rep');" id="btn" value="foo" data-sec="6" data-on-off="0" data-hour="0">
+	<button class="strtstp" onclick="clocking(); AxTimes('table');" id="btn" value="foo" data-sec="6" data-on-off="0" data-hour="0" table="TableIn">
 		Start/Stop
 	</button>
 	</div>
@@ -17,109 +17,5 @@
 	<button class="update" onclick="AxUpdate('date','time','rep')">Update</button>
 	</div>
 	
-	<!--<script type="text/javascript" src="forms/axtools.js"></script>-->
-	<script type="text/javascript">
-		var mhand = document.querySelector('.mhand').style;
-		var shand = document.querySelector('.shand').style;
-		var hhand = document.querySelector('.hhand').style;
-		var le=document.getElementById("btn");
-		var timeswitch;
-		
-		function clocking() {
-			var onoff = le.getAttribute("data-on-off");
-			
-			if (onoff == 0){
-				le.setAttribute("data-on-off", 1);
-				timeswitch = setInterval(startTime, 1000);
-			}
-			else {
-				le.setAttribute("data-on-off", 0);
-				clearInterval(timeswitch);
-			}
-		}
-		function AxFetch(zid, xid, getnum){
-			var ajax = new XMLHttpRequest();
-			ajax.onreadystatechange = function() {
-			if(this.readyState == 4 && this.status == 200) {
-				var ele = document.getElementById(zid);
-				var ment = document.getElementById(xid);
-				var sigma = this.response;
-				var [sig, ma] = sigma.split("|")
-				ele.value = ma.slice(0,-1);
-				ele.setAttribute("storage", ma.slice(0,-1));
-				ment.value = sig;
-				ment.setAttribute("storage", sig);
-				}
-			};
-			ajax.open("GET", "front.py?fetch=" + getnum, true)
-			ajax.send();
-		}
-		function AxUpdate(zid, xid, uid)
-		{
-			var ele = document.getElementById(zid);
-			var ment = document.getElementById(xid);
-			var place = document.getElementById(uid);
-			var upday = ele.value;
-			var uptime = ment.value;
-			var ajax = new XMLHttpRequest();
-			var oldday = ele.getAttribute("storage");
-			var oldtime = ment.getAttribute("storage");
-			ajax.onreadystatechange = function() {
-				if(this.readyState == 4 && this.status == 200) {
-					var sigma = this.response;
-					place.innerHTML = sigma;
-				}
-			};
-			ajax.open("GET", "front.py?update=" + upday + "&time=" + uptime + "&oldday=" + oldday + "&oldtime=" + oldtime, true);
-			ajax.send();
-		}
-		function AxRemove(zid, delnum)
-		{
-			var ajax = new XMLHttpRequest();
-			ajax.onreadystatechange = function() {
-				if(this.readyState == 4 && this.status == 200) {
-					var ele = document.getElementById(zid);
-					var sigma = this.response;
-					ele.innerHTML = sigma;
-				}
-			};
-			ajax.open("GET", "front.py?delete=" + delnum, true);
-			ajax.send();
-		}
-		function AxTimes(zid)
-		{
-		/*		This was an expeariment: Not used
-			var d = document.createDocumentFragment();
-			d.appendChild(document.getElementsByTagName("LI")[0]);
-			d.childNodes[0].childNodes[0].nodeValue = "Heyyo";
-			document.getElementsByTagName("UL")[0].appendChild(d);
-			*/
-			
-			var now = new Date().toLocaleTimeString()
-			
-			var ajax = new XMLHttpRequest();
-			ajax.onreadystatechange = function() {
-				if(this.readyState == 4 && this.status == 200) {
-					var ele = document.getElementById(zid);
-					var sigma = ele.innerHTML + this.response;
-					ele.innerHTML = sigma;
-				}
-			};
-			ajax.open("GET", "front.py?timein=" + now, true);
-			ajax.send();
-			
-		}
-		function startTime() {
-			var degToRot = le.getAttribute("data-sec")
-			shand.transform = 'rotate(' + degToRot + 'deg)';
-			shand.transformOrigin = "50% 100%";
-			mhand.transform = 'rotate(' + (Number(degToRot) / 60) + 'deg)';
-			mhand.transformOrigin = "50% 100%";
-			hhand.transform = 'rotate(' + (Number(degToRot) / 360) + 'deg)';
-			hhand.transformOrigin = "50% 100%";
-			//alert(le.getAttribute("data-sec"));
-			le.setAttribute("data-sec", Number(degToRot) + 6);
-			//document.getElementById("btn").data-sec.value += 6;
-		}
-	</script>
+	<script type="text/javascript" src="/axtools.js"></script> 
     </body>

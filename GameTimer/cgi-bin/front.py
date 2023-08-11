@@ -5,7 +5,8 @@ import pickle
 from modulus.CommonDoc import MyDoc
 from sqlcommandsnew import sqlcommands
 
-test = sqlcommands()
+TableIn = sqlcommands('TableIn')
+TableOut = sqlcommands('TableOut')
 
 skin = "cgi-bin/forms/f_front.html"
 
@@ -16,6 +17,10 @@ def MakeForm():
         lines = f.readlines()
         form = form.join(lines[0:])
     print(form)
+
+def MakeTableHead():
+    head = "<tr><th>Time In</th><th>Time Out</th></tr>"
+    return head
 
 def decode(data):
     if isinstance(data, dict):
@@ -29,34 +34,48 @@ def decode(data):
         zsave[ukey] = uval
     return zsave
 
-def MakeBtn(numeral):
-    btn = f'''<button id='{numeral}' onclick="AxRemove('rep','{numeral}')">Delete</button>'''
+def MakeBtn(numeral, inout):
+    btn = f'''<button id='{numeral}' inout='{inout}' onclick="AxRemove('{numeral}', '{inout}')">Delete</button>'''
     return btn
 
-def MakeSelector(numeral):
-    sel = f'''<div id='{numeral}' onclick="AxFetch('time','date','{numeral}')">{numeral}</div>'''
+def MakeSelector(numeral, inout):
+    sel = f'''<div id='{numeral}' inout='{inout}' onclick="AxFetch('time','date','{numeral}')">{numeral}</div>'''
     return sel
 
-def DelData(dat):
-    test.Open()
-    test.DelOne(dat)
-    test.End()
+def DelData(dat, table):
+    table.Open()
+    table.DelOne(dat)
+    table.End()
 
-def LoadOne(dat):
-    ret, bet = test.GetOne(dat)
+def LoadOne(dat, table):
+    ret, bet = table.GetOne(dat)
     return ret, bet
 
 def LoadData():
-    test.Open()
-    test.NewTable()
-    r = test.GetAll()
-    bloom = "<br><p>"
-    nochar = "!@,(){}[];' "
-    for each in r:
-        for char in nochar:
+    TableIn.Open()
+    TableOut.Open()
+    TableIn.CreateTable()
+    TableOut.CreateTable()
+    tableinfo = CreateFormattedTable()
+    return tableinfo
+
+def CreateFormattedTable():
+    recordsIn = TableIn.GetAll()
+    recordsOut = TableOut.GetAll()
+    bloom = MakeTableHead()
+    noChar = "!@,(){}[];' "
+    for each, out in zip(recordsIn, recordsOut):
+        for char in noChar:
             each = str(each).replace(char,"")
-        bloom = bloom + MakeSelector(str(each)) + str(MakeBtn(each)) + "</p><p>"
+            out = str(out).replace(char,"")
+        bloom = bloom + f"<tr><td id='{each}'>" + MakeSelector(str(each), "TableIn") + str(MakeBtn(each, 'TableIn')) + "</td>"
+        bloom = bloom + f"<td id='{out}'>" + MakeSelector(str(out), "TableOut") + str(MakeBtn(out, 'TableOut') + "</td></tr>")
     return bloom
+
+    #Create new alternating list for load
+    listIn
+    pairing = []
+    
 
 def StripData(clothed):
     clothed = str(clothed)
@@ -68,19 +87,19 @@ def StripData(clothed):
         naked = naked + each
     return naked
 
-def SaveData(data):
-    test.NewEntry(data)
-    test.End()
+def SaveData(data, table):
+    table.NewEntry(data)
+    table.End()
 
-def DoAjaxTime():
-    res = test.GetAll()
-    bloom = ""
-    if res != []:
-        for each in res:
-            bloom = bloom + each
-        return bloom
-    else:
-        return "nothing"
+#def DoAjaxTime():
+ #   res = TableIn.GetAll()
+ #   bloom = ""
+ #   if res != []:
+ #       for each in res:
+ #           bloom = bloom + each
+ #       return bloom
+ #   else:
+ #       return "nothing"
     
 
 LoadData()
@@ -88,36 +107,40 @@ LoadData()
 data = cgi.FieldStorage()
 data = decode(data)
 ztime = None
+currentTable = TableIn
+
 if not data:
     MyDoc.Do_Start()
-    print("Welcome")
+    #print("Welcome")
     print(LoadData())
-elif "update" in data:
-    print("Content-Type: text/html; charset=UTF-8\n")
-    test.UpdateOne(data['update'], data['time'], data['oldday'], data['oldtime'])
-    print(LoadData())
-    test.End()
-    quit()
-elif "delete" in data:
-    print("Content-Type: text/html; charset=UTF-8\n")
-    DelData(data['delete'])
-    print(LoadData())
-    quit()
-elif "fetch" in data:
-    print("Content-Type: text/html; charset=UTF-8\n")
-    ret, bet = LoadOne(data['fetch'])
-    ret = StripData(ret)
-    bet = StripData(bet)
-    print(ret + "|" + bet)
-    quit()
-elif "timein" in data:
-    print("Content-Type: text/html; charset=UTF-8\n")
-    timein = StripData(data['timein'])
-    print(MakeSelector(timein) + MakeBtn(str(data['timein'])) + '<br>')
-    SaveData(timein)
-    #print(DoAjaxTime())
-    quit()
+if "table" in data:
+    currentTable = eval(data['table'])
+    if "update" in data:
+        print("Content-Type: text/html; charset=UTF-8\n")
+        currentTable.UpdateOne(data['update'], data['time'], data['oldday'], data['oldtime'])
+        print(LoadData())
+        currentTable.End()
+        quit()
+    elif "delete" in data:
+        print("Content-Type: text/html; charset=UTF-8\n")
+        DelData(data['delete'], currentTable)
+        print(LoadData())
+        quit()
+    elif "fetch" in data:
+        print("Content-Type: text/html; charset=UTF-8\n")
+        ret, bet = currentTable.LoadOne(data['fetch'])
+        ret = StripData(ret)
+        bet = StripData(bet)
+        print(ret + "|" + bet)
+        quit()
+    elif "timein" in data:
+        print("Content-Type: text/html; charset=UTF-8\n")
+        timein = StripData(data['timein'])
+        SaveData(timein, currentTable)
+        print(LoadData())
+        #print(DoAjaxTime())
 
+        quit()
 
 
 MakeForm()
