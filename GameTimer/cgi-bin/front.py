@@ -64,17 +64,34 @@ def CreateFormattedTable():
     recordsOut = TableOut.GetAll()
     bloom = MakeTableHead()
     noChar = "!@,(){}[];' "
-    for each, out in zip(recordsIn, recordsOut):
+    #pairing = [None]*(len(recordsIn)+len(recordsOut))
+    #pairing[::2] = recordsIn
+    #pairing[1::2] = recordsOut
+    intertwining = [[enter, exit] for enter, exit in zip(recordsIn, recordsOut)]
+    table = 'TableIn'
+    for twin in intertwining:
+        for each in twin:
+            for char in noChar:
+                each = str(each).replace(char,"")
+            if table == 'TableIn':
+                bloom = bloom + "<tr><td>" + MakeSelector(str(each), table) + str(MakeBtn(each, table) + '</td>')
+                table = 'TableOut'
+            else:
+                bloom = bloom + "<td>" + MakeSelector(str(each), table) + str(MakeBtn(each, table) + '</td></tr>')
+                table = 'TableIn'
+    return bloom
+"""     for each, out in zip(recordsIn, recordsOut):
         for char in noChar:
             each = str(each).replace(char,"")
             out = str(out).replace(char,"")
         bloom = bloom + f"<tr><td id='{each}'>" + MakeSelector(str(each), "TableIn") + str(MakeBtn(each, 'TableIn')) + "</td>"
         bloom = bloom + f"<td id='{out}'>" + MakeSelector(str(out), "TableOut") + str(MakeBtn(out, 'TableOut') + "</td></tr>")
-    return bloom
+    return bloom """
 
     #Create new alternating list for load
-    listIn
-    pairing = []
+    
+
+    
     
 
 def StripData(clothed):
