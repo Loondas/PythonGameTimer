@@ -62,6 +62,10 @@ def LoadData():
 def CreateFormattedTable():
     recordsIn = TableIn.GetAll()
     recordsOut = TableOut.GetAll()
+    while len(recordsIn) < len(recordsOut):
+        recordsIn.append(None)
+    while len(recordsIn) > len(recordsOut):
+        recordsOut.append(None)
     bloom = MakeTableHead()
     noChar = "!@,(){}[];' "
     #pairing = [None]*(len(recordsIn)+len(recordsOut))
