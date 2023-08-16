@@ -87,8 +87,7 @@ class sqlcommands:
             Lalist = self.curs.fetchone()
             self.curs.execute("Select TimeIn from " + self.table_name + " where TimeIn = '" + TimeIn + "';")
             Lelist = self.curs.fetchone()
-            print(Lelist,Lalist)
-            return Lalist, Lelist
+            return Lelist, Lalist
 ##            for ref in zlist:
 ##                yield ref #Must itterate throught the yield
         return None

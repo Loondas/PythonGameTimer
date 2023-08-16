@@ -25,6 +25,7 @@
 				var ment = document.getElementById(xid);
 				var sigma = this.response;
 				var [sig, ma] = sigma.split("|")
+				console.log(sig,ma)
 				ele.value = ma.slice(0,-1);
 				ele.setAttribute("storage", ma.slice(0,-1));
 				ment.value = sig;
