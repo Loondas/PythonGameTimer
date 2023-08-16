@@ -31,7 +31,7 @@
 				ment.setAttribute("storage", sig);
 				}
 			};
-			ajax.open("GET", "front.py?fetch=" + getnum, true)
+			ajax.open("GET", "front.py?fetch=" + getnum + "&table=TableIn", true)
 			ajax.send();
 		}
 		function AxUpdate(zid, xid, uid)

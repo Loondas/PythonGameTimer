@@ -3,10 +3,9 @@ import os.path
 import pickle
 
 from modulus.CommonDoc import MyDoc
-from sqlcommandsnew import sqlcommands
+from newsqlcommands import sqlcommands
 
-TableIn = sqlcommands('TableIn')
-TableOut = sqlcommands('TableOut')
+TimeTable = sqlcommands('TimeTable')
 
 skin = "cgi-bin/forms/f_front.html"
 
@@ -42,61 +41,39 @@ def MakeSelector(numeral, inout):
     sel = f'''<div id='{numeral}' inout='{inout}' onclick="AxFetch('time','date','{numeral}')">{numeral}</div>'''
     return sel
 
-def DelData(dat, table):
-    table.Open()
-    table.DelOne(dat)
-    table.End()
+def DelData(dat):
+    TimeTable.Open()
+    TimeTable.DelOne(dat)
+    TimeTable.End()
 
-def LoadOne(dat, table):
-    ret, bet = table.GetOne(dat)
+def LoadOne(dat):
+    ret, bet = TimeTable.GetOne(dat)
     return ret, bet
 
 def LoadData():
-    TableIn.Open()
-    TableOut.Open()
-    TableIn.CreateTable()
-    TableOut.CreateTable()
+    TimeTable.Open()
+    TimeTable.CreateTable()
     tableinfo = CreateFormattedTable()
     return tableinfo
 
 def CreateFormattedTable():
-    recordsIn = TableIn.GetAll()
-    recordsOut = TableOut.GetAll()
-    while len(recordsIn) < len(recordsOut):
-        recordsIn.append(None)
-    while len(recordsIn) > len(recordsOut):
-        recordsOut.append(None)
+    recordsIn = TimeTable.GetAll()
     bloom = MakeTableHead()
     noChar = "!@,(){}[];' "
-    #pairing = [None]*(len(recordsIn)+len(recordsOut))
-    #pairing[::2] = recordsIn
-    #pairing[1::2] = recordsOut
-    intertwining = [[enter, exit] for enter, exit in zip(recordsIn, recordsOut)]
+    intertwining = [[enter, exit] for enter, exit in recordsIn]
     table = 'TableIn'
     for twin in intertwining:
         for each in twin:
             for char in noChar:
                 each = str(each).replace(char,"")
             if table == 'TableIn':
-                bloom = bloom + "<tr><td>" + MakeSelector(str(each), table) + str(MakeBtn(each, table) + '</td>')
+                bloom = bloom + "<tr><td>" + MakeSelector(str(each), table) + '</td>'
                 table = 'TableOut'
             else:
-                bloom = bloom + "<td>" + MakeSelector(str(each), table) + str(MakeBtn(each, table) + '</td></tr>')
+                bloom = bloom + "<td>" + MakeSelector(str(each), table)
                 table = 'TableIn'
+        bloom = bloom + str(MakeBtn(twin[0], table)) + '</td></tr>'
     return bloom
-"""     for each, out in zip(recordsIn, recordsOut):
-        for char in noChar:
-            each = str(each).replace(char,"")
-            out = str(out).replace(char,"")
-        bloom = bloom + f"<tr><td id='{each}'>" + MakeSelector(str(each), "TableIn") + str(MakeBtn(each, 'TableIn')) + "</td>"
-        bloom = bloom + f"<td id='{out}'>" + MakeSelector(str(out), "TableOut") + str(MakeBtn(out, 'TableOut') + "</td></tr>")
-    return bloom """
-
-    #Create new alternating list for load
-    
-
-    
-    
 
 def StripData(clothed):
     clothed = str(clothed)
@@ -109,18 +86,13 @@ def StripData(clothed):
     return naked
 
 def SaveData(data, table):
-    table.NewEntry(data)
-    table.End()
-
-#def DoAjaxTime():
- #   res = TableIn.GetAll()
- #   bloom = ""
- #   if res != []:
- #       for each in res:
- #           bloom = bloom + each
- #       return bloom
- #   else:
- #       return "nothing"
+    if table == 'TableIn':
+        TimeTable.NewIn(data)
+        TimeTable.End()
+    else:
+        TimeTable.GetLast()
+        TimeTable.NewOut(data)
+        TimeTable.End()
     
 
 LoadData()
@@ -128,14 +100,14 @@ LoadData()
 data = cgi.FieldStorage()
 data = decode(data)
 ztime = None
-currentTable = TableIn
+currentTable = TimeTable
 
 if not data:
     MyDoc.Do_Start()
     #print("Welcome")
     print(LoadData())
 if "table" in data:
-    currentTable = eval(data['table'])
+    currentTable = data['table']
     if "update" in data:
         print("Content-Type: text/html; charset=UTF-8\n")
         currentTable.UpdateOne(data['update'], data['time'], data['oldday'], data['oldtime'])
@@ -144,12 +116,12 @@ if "table" in data:
         quit()
     elif "delete" in data:
         print("Content-Type: text/html; charset=UTF-8\n")
-        DelData(data['delete'], currentTable)
+        DelData(data['delete'])
         print(LoadData())
         quit()
     elif "fetch" in data:
         print("Content-Type: text/html; charset=UTF-8\n")
-        ret, bet = currentTable.LoadOne(data['fetch'])
+        ret, bet = LoadOne(data['fetch'])
         ret = StripData(ret)
         bet = StripData(bet)
         print(ret + "|" + bet)
