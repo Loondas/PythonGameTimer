@@ -20,7 +20,8 @@ class sqlcommands:
 
     def CreateTable(self):
         sqlCommand = f"""CREATE TABLE if not EXISTS {self.table_name} (
-        TimeIn TEXT PRIMARY KEY,
+        EntryNumber INTEGER PRIMARY KEY,
+        TimeIn TEXT,
         DateIn TEXT,
         TimeOut TEXT,
         DateOut TEXT);"""
@@ -81,11 +82,12 @@ class sqlcommands:
             return True
         return False
 
-    def GetOne(self, TimeIn):
+    def GetOne(self, TimeIn, inout):
         if self.bOpen:
-            self.curs.execute("Select DateIn from " + self.table_name + " where TimeIn = '" + TimeIn + "';")
+            if inout == "TimeIn": self.curs.execute(f"Select DateIn from {self.table_name} where {inout} = '{TimeIn}';")
+            else: self.curs.execute(f"Select DateOut from {self.table_name} where {inout} = '{TimeIn}';")
             Lalist = self.curs.fetchone()
-            self.curs.execute("Select TimeIn from " + self.table_name + " where TimeIn = '" + TimeIn + "';")
+            self.curs.execute(f"Select {inout} from {self.table_name} where {inout} = '{TimeIn}';")
             Lelist = self.curs.fetchone()
             return Lelist, Lalist
 ##            for ref in zlist:
@@ -100,9 +102,12 @@ class sqlcommands:
                 return True
         return False
 
-    def UpdateOne(self, new, time, oldday, oldtime):
+    def UpdateOne(self, new, time, oldday, oldtime, inout):
         if self.bOpen:
-            self.curs.execute("UPDATE " + self.table_name + " SET DateIn = '" + new + "', TimeIn = '" + time + "' WHERE TimeIn = '" + oldday + "' and DateIn = '" + oldtime + "';")
+            if inout == "TimeIn": 
+                self.curs.execute(f"UPDATE {self.table_name} SET DateIn = '{new} ', {inout} = '{time}' WHERE DateIn = '{oldday}' and {inout} = '{oldtime}';")
+            else: 
+                self.curs.execute(f"UPDATE {self.table_name} SET DateOut = '{new} ', {inout} = '{time}' WHERE DateOut = '{oldday}' and {inout} = '{oldtime}';") 
             self.conn.commit()
             return True
         return False
@@ -118,24 +123,3 @@ class sqlcommands:
             self.conn.commit()
             self.bOpen = False
         return True
-
-        @staticmethod
-        def Import(dao, encoding=None, text_file='Employees.csv', hasHeader=True, sep='|'):
-            try:
-                # dao.open()
-                with open(text_file, encoding=encoding) as fh:
-                    line = fh.readline().strip()
-                    if hasHeader is True:
-                        line = fh.readline().strip()
-                    while len(line) is not 0:
-                        if dao.insert(line.split(sep)) is False:
-                            return False
-                        line = fh.readline().strip()
-                # dao.close()
-                return True
-            except:
-                pass
-            return False
-
-
-    

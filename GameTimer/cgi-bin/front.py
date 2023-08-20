@@ -46,32 +46,32 @@ def DelData(dat):
     TimeTable.DelOne(dat)
     TimeTable.End()
 
-def LoadOne(dat):
-    ret, bet = TimeTable.GetOne(dat)
+def LoadOne(dat, inout):
+    ret, bet = TimeTable.GetOne(dat, inout)
     return ret, bet
 
 def LoadData():
     TimeTable.Open()
     TimeTable.CreateTable()
-    tableinfo = CreateFormattedTable()
-    return tableinfo
+    TimeInfo = CreateFormattedTable()
+    return TimeInfo
 
 def CreateFormattedTable():
     recordsIn = TimeTable.GetAll()
     bloom = MakeTableHead()
     noChar = "!@,(){}[];' "
     intertwining = [[enter, exit] for enter, exit in recordsIn]
-    table = 'TableIn'
+    table = 'TimeIn'
     for twin in intertwining:
         for each in twin:
             for char in noChar:
                 each = str(each).replace(char,"")
-            if table == 'TableIn':
+            if table == 'TimeIn':
                 bloom = bloom + "<tr><td>" + MakeSelector(str(each), table) + '</td>'
-                table = 'TableOut'
+                table = 'TimeOut'
             else:
                 bloom = bloom + "<td>" + MakeSelector(str(each), table)
-                table = 'TableIn'
+                table = 'TimeIn'
         bloom = bloom + str(MakeBtn(twin[0], table)) + '</td></tr>'
     return bloom
 
@@ -86,7 +86,7 @@ def StripData(clothed):
     return naked
 
 def SaveData(data, table):
-    if table == 'TableIn':
+    if table == 'TimeIn':
         TimeTable.NewIn(data)
         TimeTable.End()
     else:
@@ -100,19 +100,18 @@ LoadData()
 data = cgi.FieldStorage()
 data = decode(data)
 ztime = None
-currentTable = TimeTable
 
 if not data:
     MyDoc.Do_Start()
     #print("Welcome")
     print(LoadData())
 if "table" in data:
-    currentTable = data['table']
+    TableInOut = data['table']
     if "update" in data:
         print("Content-Type: text/html; charset=UTF-8\n")
-        currentTable.UpdateOne(data['update'], data['time'], data['oldday'], data['oldtime'])
+        TimeTable.UpdateOne(data['update'], data['time'], data['oldday'], data['oldtime'], TableInOut)
         print(LoadData())
-        currentTable.End()
+        TimeTable.End()
         quit()
     elif "delete" in data:
         print("Content-Type: text/html; charset=UTF-8\n")
@@ -121,7 +120,7 @@ if "table" in data:
         quit()
     elif "fetch" in data:
         print("Content-Type: text/html; charset=UTF-8\n")
-        ret, bet = LoadOne(data['fetch'])
+        ret, bet = LoadOne(data['fetch'], TableInOut)
         ret = StripData(ret)
         bet = StripData(bet)
         print(ret + "|" + bet)
@@ -129,7 +128,7 @@ if "table" in data:
     elif "timein" in data:
         print("Content-Type: text/html; charset=UTF-8\n")
         timein = StripData(data['timein'])
-        SaveData(timein, currentTable)
+        SaveData(timein, TableInOut)
         print(LoadData())
         #print(DoAjaxTime())
 

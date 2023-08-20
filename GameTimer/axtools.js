@@ -25,30 +25,32 @@
 				var ment = document.getElementById(xid);
 				var sigma = this.response;
 				var [sig, ma] = sigma.split("|")
-				console.log(sig,ma)
 				ele.value = ma.slice(0,-1);
 				ele.setAttribute("storage", ma.slice(0,-1));
 				ment.value = sig;
 				ment.setAttribute("storage", sig);
 				}
 			};
-			ajax.open("GET", "front.py?fetch=" + getnum + "&table=TableIn", true)
+			var inout = document.getElementById(getnum).getAttribute("inout")
+			document.getElementById("update").setAttribute("inout", inout)
+			ajax.open("GET", "front.py?fetch=" + getnum + "&table=" + inout, true)
 			ajax.send();
 		}
 		function AxUpdate(zid, xid, uid)
 		{
-			var upday = document.getElementById(zid).value;
-			var uptime = document.getElementById(xid).value;
+			var upday = document.getElementById(xid).value;
+			var uptime = document.getElementById(zid).value;
 			var ajax = new XMLHttpRequest();
-			var oldday = document.getElementById(zid).getAttribute("storage");
-			var oldtime = document.getElementById(xid).getAttribute("storage");
+			var oldday = document.getElementById(xid).getAttribute("storage");
+			var oldtime = document.getElementById(zid).getAttribute("storage");
+			var inout = document.getElementById("update").getAttribute("inout")
 			ajax.onreadystatechange = function() {
 				if(this.readyState == 4 && this.status == 200) {
 					var sigma = this.response;
 					document.getElementById(uid).innerHTML = sigma;
 				}
 			};
-			ajax.open("GET", "front.py?update=" + upday + "&time=" + uptime + "&oldday=" + oldday + "&oldtime=" + oldtime, true);
+			ajax.open("GET", "front.py?update=" + upday + "&time=" + uptime + "&oldday=" + oldday + "&oldtime=" + oldtime + "&table=" + inout, true);
 			ajax.send();
 		}
 		function AxRemove(zid, table)
@@ -85,11 +87,11 @@
 				}
 			};
 			ajax.open("GET", "front.py?timein=" + now + "&table=" + table , true);
-			if(table == "TableIn") {
-				StartStopButton.setAttribute("table","TableOut")
+			if(table == "TimeIn") {
+				StartStopButton.setAttribute("table","TimeOut")
 			}
 			else {
-				StartStopButton.setAttribute("table","TableIn")
+				StartStopButton.setAttribute("table","TimeIn")
 			}
 			ajax.send();
 			
