@@ -41,12 +41,17 @@ class sqlcommands:
             self.conn.commit()
             return True
         return False
+    
+    def FillMissing(self, time_out, date_out, ifempty):
+        if self.bOpen:
+            self.curs.execute(f"UPDATE {self.table_name} SET DateOut = '{date_out}', TimeOut = '{time_out}' WHERE TimeIn = '{ifempty}';")
+            self.conn.commit()
+            return True
+        return False
 
     def GetAll(self):
         self.curs.execute("SELECT TimeIn, TimeOut FROM " + self.table_name + ";")
         ans = self.curs.fetchall()
-    ##    for i in ans:
-    ##        print(i)
         return ans
 
     def GetLast(self):
@@ -89,9 +94,9 @@ class sqlcommands:
             Lalist = self.curs.fetchone()
             self.curs.execute(f"Select {inout} from {self.table_name} where {inout} = '{TimeIn}';")
             Lelist = self.curs.fetchone()
-            return Lelist, Lalist
-##            for ref in zlist:
-##                yield ref #Must itterate throught the yield
+            self.curs.execute(f"SELECT TimeIn FROM {self.table_name} WHERE TimeOut is null;")
+            saved = self.curs.fetchone()
+            return Lelist, Lalist, saved
         return None
     
     def DelEm(self, TimeIns):

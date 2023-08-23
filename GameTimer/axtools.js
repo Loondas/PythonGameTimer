@@ -24,11 +24,12 @@
 				var ele = document.getElementById(zid);
 				var ment = document.getElementById(xid);
 				var sigma = this.response;
-				var [sig, ma] = sigma.split("|")
-				ele.value = ma.slice(0,-1);
-				ele.setAttribute("storage", ma.slice(0,-1));
+				var [sig, ma, saved] = sigma.split("|")
+				ele.value = ma;
+				ele.setAttribute("storage", ma);
 				ment.value = sig;
 				ment.setAttribute("storage", sig);
+				ele.setAttribute("ifempty", saved.slice(0,-1))
 				}
 			};
 			var inout = document.getElementById(getnum).getAttribute("inout")
@@ -43,14 +44,15 @@
 			var ajax = new XMLHttpRequest();
 			var oldday = document.getElementById(xid).getAttribute("storage");
 			var oldtime = document.getElementById(zid).getAttribute("storage");
-			var inout = document.getElementById("update").getAttribute("inout")
+			var inout = document.getElementById("update").getAttribute("inout");
+			var ifempty = document.getElementById(xid).getAttribute("ifempty");
 			ajax.onreadystatechange = function() {
 				if(this.readyState == 4 && this.status == 200) {
 					var sigma = this.response;
 					document.getElementById(uid).innerHTML = sigma;
 				}
 			};
-			ajax.open("GET", "front.py?update=" + upday + "&time=" + uptime + "&oldday=" + oldday + "&oldtime=" + oldtime + "&table=" + inout, true);
+			ajax.open("GET", "front.py?update=" + upday + "&time=" + uptime + "&oldday=" + oldday + "&oldtime=" + oldtime + "&table=" + inout + "&ifempty=" + ifempty, true);
 			ajax.send();
 		}
 		function AxRemove(zid, table)

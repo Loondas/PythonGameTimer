@@ -47,8 +47,8 @@ def DelData(dat):
     TimeTable.End()
 
 def LoadOne(dat, inout):
-    ret, bet = TimeTable.GetOne(dat, inout)
-    return ret, bet
+    ret, bet, const = TimeTable.GetOne(dat, inout)
+    return ret, bet, const
 
 def LoadData():
     TimeTable.Open()
@@ -103,30 +103,30 @@ ztime = None
 
 if not data:
     MyDoc.Do_Start()
-    #print("Welcome")
     print(LoadData())
 if "table" in data:
     TableInOut = data['table']
+    print("Content-Type: text/html; charset=UTF-8\n")
     if "update" in data:
-        print("Content-Type: text/html; charset=UTF-8\n")
-        TimeTable.UpdateOne(data['update'], data['time'], data['oldday'], data['oldtime'], TableInOut)
+        if data['oldtime'] == 'None':
+            TimeTable.FillMissing(data['time'],data['update'], data['ifempty'])
+        else:
+            TimeTable.UpdateOne(data['update'], data['time'], data['oldday'], data['oldtime'], TableInOut)
         print(LoadData())
         TimeTable.End()
         quit()
     elif "delete" in data:
-        print("Content-Type: text/html; charset=UTF-8\n")
         DelData(data['delete'])
         print(LoadData())
         quit()
     elif "fetch" in data:
-        print("Content-Type: text/html; charset=UTF-8\n")
-        ret, bet = LoadOne(data['fetch'], TableInOut)
+        ret, bet, const = LoadOne(data['fetch'], TableInOut)
         ret = StripData(ret)
         bet = StripData(bet)
-        print(ret + "|" + bet)
+        const = StripData(const)
+        print(ret + "|" + bet + "|"+ const)
         quit()
     elif "timein" in data:
-        print("Content-Type: text/html; charset=UTF-8\n")
         timein = StripData(data['timein'])
         SaveData(timein, TableInOut)
         print(LoadData())
