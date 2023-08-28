@@ -51,13 +51,24 @@
 	position: absolute;
 	right: 100px;
 	top: 300px;
+	background-color: chocolate;
 }
 #rep{
-	width: 500px;
+	width: 300px;
+	height: 600px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	background-color: bisque;
 }
 #time, #date{
 	display: block;
 }
-p:hover{
-	color:blue;
+#sel:hover{
+	color:rgb(12, 12, 158);
+}
+th{
+	background-color: rgb(88, 220, 220);
+}
+body{
+	background-color: azure;
 }

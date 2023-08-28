@@ -14,7 +14,7 @@ class MyDoc:
         print ("</head>")
         print ("<body>")
         print ("<div id='rep'>")
-        print ("<table id='table' style='width:30%'>")
+        print ("<table id='table' style='width:100%'>")
         #print ("<nav>")
         #print ("<ul>")
         #print ('<li><a href="front.py">Home</a></li>')

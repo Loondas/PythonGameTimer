@@ -38,7 +38,7 @@ def MakeBtn(numeral, inout):
     return btn
 
 def MakeSelector(numeral, inout):
-    sel = f'''<div id='{numeral}' inout='{inout}' onclick="AxFetch('time','date','{numeral}')">{numeral}</div>'''
+    sel = f'''<div id='{numeral}' inout='{inout}' onclick="AxFetch('time','date','{numeral}')"><div id='sel'>{numeral}</div></div>'''
     return sel
 
 def DelData(dat):
